@@ -2,3 +2,4 @@
 *.ap_
 *.dex
 *.apk
+/contacts/EoeFragment/bin/*
