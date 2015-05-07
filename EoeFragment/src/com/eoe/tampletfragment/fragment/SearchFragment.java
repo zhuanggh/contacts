@@ -131,6 +131,7 @@ public class SearchFragment extends Fragment {
 		if (list_show.size() != 0) {
 			adapter.setList(list_show);
 			adapter.setType(type);
+			adapter.setSearchKeys(null);
 			adapter.notifyDataSetChanged();
 		}
 		return view;
@@ -281,6 +282,7 @@ public class SearchFragment extends Fragment {
 
 				adapter.setList(list_show);
 				adapter.setType(type);
+				adapter.setSearchKeys(content);
 				adapter.notifyDataSetChanged();
 
 				// if (content.length() > 0) {
@@ -298,6 +300,7 @@ public class SearchFragment extends Fragment {
 						adapter.setList(list_show);
 						type.clear();
 						adapter.setType(type);
+						adapter.setSearchKeys(null);
 						adapter.notifyDataSetChanged();
 					}
 				}

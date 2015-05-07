@@ -51,7 +51,7 @@ public class ToPinYin {
                 zhongWenPinYin += chars[i];   
             }   
         }   
-        return zhongWenPinYin;   
+        return zhongWenPinYin.toLowerCase();   
     }   
     
     public static String getFirstPinYin(String zhongwen)
@@ -64,12 +64,12 @@ public class ToPinYin {
         String[] pinYin = PinyinHelper.toHanyuPinyinStringArray(chars[i], getDefaultOutputFormat());   
         // ��ת�����������ַ�ʱ,����null   
         if (pinYin != null) {   
-        	zhongWenFirstPinYin += (char)(pinYin[0].charAt(0)-'A'+'a');   
+        	zhongWenFirstPinYin +=(char)(pinYin[0].charAt(0)-'A'+'a');   
         } else {   
-            zhongWenFirstPinYin += chars[i] ; 
+            zhongWenFirstPinYin += chars[i];   
         }   
     }   
-    return zhongWenFirstPinYin;   
+    return zhongWenFirstPinYin.toLowerCase();   
 	}
     /**  
      * �����ʽ  
@@ -84,3 +84,4 @@ public class ToPinYin {
         return format;   
     }   
 }
+

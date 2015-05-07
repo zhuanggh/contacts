@@ -44,7 +44,7 @@ public class ContactsInfo {
 				setFirstPinYin(ToPinYin.getFirstPinYin(Name));
 			} catch (BadHanyuPinyinOutputFormatCombination e) {
 				e.printStackTrace();
-			}// 如果是中文就转换为大写拼音，如果是字母就转换为小写格式
+			}// 如果是中文就转换为小写拼音，如果是字母就转换为小写格式
 		}
 	}
 

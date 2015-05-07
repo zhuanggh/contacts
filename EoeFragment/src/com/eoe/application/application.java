@@ -22,7 +22,7 @@ public class application extends Application {
 			switch (msg.what) {
 			case MSG_SUCCESS:
 				dbOpera.setInfo();
-				//load_data();
+				load_data();
 				break;
 
 			case MSG_FAILURE:
