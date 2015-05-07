@@ -66,13 +66,6 @@ public class SearchFragment extends Fragment {
 		dbOpera = ((application) getActivity().getApplication())
 				.getDatabaseOperation();
 		db = dbOpera.getDatabase();
-		list = dbOpera.getAllUser();
-		list_show = list;
-		if (list_show.size() != 0) {
-			adapter.setList(list_show);
-			adapter.setType(type);
-			adapter.notifyDataSetChanged();
-		}
 	}
 
 	@Override
@@ -133,6 +126,13 @@ public class SearchFragment extends Fragment {
 			}
 		});
 		initListener();
+		list = dbOpera.getAllUser();
+		list_show = list;
+		if (list_show.size() != 0) {
+			adapter.setList(list_show);
+			adapter.setType(type);
+			adapter.notifyDataSetChanged();
+		}
 		return view;
 	}
 

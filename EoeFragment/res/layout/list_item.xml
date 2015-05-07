@@ -4,10 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
-    <Button
-        android:id="@+id/bt_query"
-        android:layout_width="match_parent"
-        android:layout_height="80dp" />
+
 
     <ImageView
         android:id="@+id/animal"

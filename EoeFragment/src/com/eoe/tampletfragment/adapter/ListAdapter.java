@@ -113,17 +113,6 @@ public class ListAdapter extends BaseAdapter {
 			}
 		}
 		
-		Button delButton = (Button)convertView.findViewById(R.id.bt_query); 
-		delButton.setTag(position); 
-		delButton.setOnClickListener(new View.OnClickListener() { 
-			public void onClick(View v) { 
-				//int index = Integer.parseInt(v.getTag().toString());
-				int index = (Integer)v.getTag(); 
-				Intent intent = new Intent(context, QueryActivity.class);
-				intent.putExtra("key", list.get(index).getId());
-				context.startActivity(intent);
-				} 
-			});
 		// holder.speaker.setOnClickListener(new OnClickListener(){
 		//
 		// @Override
