@@ -159,12 +159,12 @@ public class DatabaseOperation {
 		return user;
 	}
 
-	public void delete(ContactsInfo user) {
-		db.execSQL("delete from contacts where id=" + user.getId());
-		db.execSQL("delete from phone where id=" + user.getId());
-		db.execSQL("delete from label where id=" + user.getId());
-		db.execSQL("delete from vir_address where sourceid=" + user.getId());
-		db.execSQL("delete from vir_remarks where sourceid=" + user.getId());
+	public void delete(int id) {
+		db.execSQL("delete from contacts where id=" + id);
+		db.execSQL("delete from phone where id=" + id);
+		db.execSQL("delete from label where id=" + id);
+		db.execSQL("delete from vir_address where sourceid=" + id);
+		db.execSQL("delete from vir_remarks where sourceid=" + id);
 	}
 
 	/**
@@ -172,7 +172,7 @@ public class DatabaseOperation {
 	 */
 	public void modify(ContactsInfo user) {
 		// 删除旧的数据
-		delete(user);
+		delete(user.getId());
 		// id和name必须有，才能进行modify操作,id相同保证的和其他表的一致性
 		insert(user);
 	}

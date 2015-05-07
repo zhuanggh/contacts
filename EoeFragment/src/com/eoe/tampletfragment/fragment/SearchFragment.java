@@ -1,28 +1,34 @@
 package com.eoe.tampletfragment.fragment;
 
-
 import java.util.ArrayList;
-
 
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.ListFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.eoe.application.application;
 import com.eoe.store.ContactsInfo;
 import com.eoe.store.DatabaseOperation;
 import com.eoe.tampletfragment.MainActivity;
+import com.eoe.tampletfragment.QueryActivity;
 import com.eoe.tampletfragment.R;
 import com.eoe.tampletfragment.addActivity;
 import com.eoe.tampletfragment.adapter.ListAdapter;
@@ -33,11 +39,11 @@ import com.eoe.tampletfragment.view.TitleView.OnRightButtonClickListener;
 /**
  * @author yangyu 功能描述：搜索fragment页面
  */
-public class SearchFragment extends ListFragment {
+public class SearchFragment extends Fragment {
 	private DatabaseOperation dbOpera = null;
 	private SQLiteDatabase db = null;
 	private ArrayList<ContactsInfo> list = new ArrayList<ContactsInfo>();
-	private ArrayList<ContactsInfo> list_search = new ArrayList<ContactsInfo>();
+	private ArrayList<ContactsInfo> list_show = new ArrayList<ContactsInfo>();
 	private ArrayList<String> type = new ArrayList<String>();
 	private View mParent;
 	private FragmentActivity mActivity;
@@ -47,6 +53,7 @@ public class SearchFragment extends ListFragment {
 	private TitleView mTitle;
 
 	private ListAdapter adapter = null;
+	private ListView mListView = null;
 
 	/**
 	 * Create a new instance of DetailsFragment, initialized to show the text at
@@ -55,24 +62,23 @@ public class SearchFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		adapter = new ListAdapter(getActivity());
-		setListAdapter(adapter);
+
 		dbOpera = ((application) getActivity().getApplication())
 				.getDatabaseOperation();
 		db = dbOpera.getDatabase();
+		list = dbOpera.getAllUser();
+		list_show = list;
+		if (list_show.size() != 0) {
+			adapter.setList(list_show);
+			adapter.setType(type);
+			adapter.notifyDataSetChanged();
+		}
 	}
 
 	@Override
 	public void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-
-		list = dbOpera.getAllUser();
-		if (list.size() != 0) {
-			adapter.setList(list);
-			adapter.setType(type);
-			adapter.notifyDataSetChanged();
-		}
 	}
 
 	public static SearchFragment newInstance(int index) {
@@ -97,6 +103,35 @@ public class SearchFragment extends ListFragment {
 				.inflate(R.layout.fragment_search, container, false);
 		ivClearText = (ImageView) view.findViewById(R.id.ivClearText);
 		etSearch = (EditText) view.findViewById(R.id.et_search);
+		mListView = (ListView) view.findViewById(R.id.list);
+		adapter = new ListAdapter(getActivity());
+		mListView.setAdapter(adapter);
+		mListView.setFocusable(true);
+		mListView.setFocusableInTouchMode(true);
+		mListView.requestFocus();
+		mListView
+				.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+					@Override
+					public void onCreateContextMenu(ContextMenu menu, View v,
+							ContextMenuInfo menuInfo) {
+						menu.setHeaderTitle("菜单");
+						menu.add(0, 0, 0, "拨号");
+						menu.add(0, 1, 0, "编辑联系人");
+						menu.add(0, 2, 0, "删除联系人");
+						// TODO Auto-generated method stub
+					}
+				});
+
+		// 实现单击事件
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Intent intent = new Intent(mActivity, QueryActivity.class);
+				intent.putExtra("key", list_show.get(position).getId());
+				mActivity.startActivity(intent);
+			}
+		});
 		initListener();
 		return view;
 	}
@@ -123,6 +158,39 @@ public class SearchFragment extends ListFragment {
 				goHelp();
 			}
 		});
+	}
+
+	// 选中菜单Item后触发
+	public boolean onContextItemSelected(MenuItem item) {
+		// 关键代码在这里 menuInfo.position
+		AdapterView.AdapterContextMenuInfo menuInfo;
+		menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		switch (item.getItemId()) {
+		case 0:
+			// 拨号操作
+			Uri uri = Uri.parse("tel:"
+					+ list_show.get(menuInfo.position).getPhoneNum(0));
+			Intent it = new Intent(Intent.ACTION_CALL, uri);
+			startActivity(it);
+			break;
+
+		case 1:
+			Intent intent = new Intent(mActivity, QueryActivity.class);
+			intent.putExtra("key", list_show.get(menuInfo.position).getId());
+			mActivity.startActivity(intent);
+			// 编辑操作
+			break;
+
+		case 2:
+			dbOpera.delete(list_show.get(menuInfo.position).getId());
+			// 删除操作
+			break;
+
+		default:
+			break;
+		}
+
+		return super.onContextItemSelected(item);
 	}
 
 	private void initListener() {
@@ -152,7 +220,7 @@ public class SearchFragment extends ListFragment {
 			public void afterTextChanged(Editable e) {
 
 				String content = etSearch.getText().toString();
-				list_search.clear();
+				list_show.clear();
 				type.clear();
 				if ("".equals(content)) {
 					ivClearText.setVisibility(View.INVISIBLE);
@@ -166,7 +234,7 @@ public class SearchFragment extends ListFragment {
 					for (int i = 0; i < cursor.getCount(); i++) {
 						cursor.moveToNext();
 						int id = cursor.getInt(0);
-						list_search.add(dbOpera.query(id));
+						list_show.add(dbOpera.query(id));
 						type.add("phonenum" + cursor.getString(1));
 					}
 					cursor.close();
@@ -179,7 +247,7 @@ public class SearchFragment extends ListFragment {
 					for (int i = 0; i < cursor.getCount(); i++) {
 						cursor.moveToNext();
 						int id = cursor.getInt(0);
-						list_search.add(dbOpera.query(id));
+						list_show.add(dbOpera.query(id));
 						type.add("FirstpinYin");
 					}
 					cursor.close();
@@ -189,7 +257,7 @@ public class SearchFragment extends ListFragment {
 					for (int i = 0; i < cursor1.getCount(); i++) {
 						cursor1.moveToNext();
 						int id = cursor1.getInt(0);
-						list_search.add(dbOpera.query(id));
+						list_show.add(dbOpera.query(id));
 						type.add("pinYin");
 					}
 
@@ -203,7 +271,7 @@ public class SearchFragment extends ListFragment {
 					for (int i = 0; i < cursor.getCount(); i++) {
 						cursor.moveToNext();
 						int id = cursor.getInt(0);
-						list_search.add(dbOpera.query(id));
+						list_show.add(dbOpera.query(id));
 						type.add("name");
 					}
 					cursor.close();
@@ -211,7 +279,7 @@ public class SearchFragment extends ListFragment {
 				search_address();
 				search_remarks();
 
-				adapter.setList(list_search);
+				adapter.setList(list_show);
 				adapter.setType(type);
 				adapter.notifyDataSetChanged();
 
@@ -225,8 +293,9 @@ public class SearchFragment extends ListFragment {
 				// }
 				// mListView.setSelection(0);
 				if (content == "") {
-					if (list.size() != 0) {
-						adapter.setList(list);
+					list_show = list;
+					if (list_show.size() != 0) {
+						adapter.setList(list_show);
 						type.clear();
 						adapter.setType(type);
 						adapter.notifyDataSetChanged();
@@ -270,7 +339,7 @@ public class SearchFragment extends ListFragment {
 		for (int i = 0; i < cursor.getCount(); i++) {
 			cursor.moveToNext();
 			int id = cursor.getInt(0);
-			list_search.add(dbOpera.query(id));
+			list_show.add(dbOpera.query(id));
 			type.add("address");
 		}
 		cursor.close();
@@ -285,7 +354,7 @@ public class SearchFragment extends ListFragment {
 		for (int i = 0; i < cursor.getCount(); i++) {
 			cursor.moveToNext();
 			int id = cursor.getInt(0);
-			list_search.add(dbOpera.query(id));
+			list_show.add(dbOpera.query(id));
 			type.add("remarks");
 		}
 		cursor.close();
