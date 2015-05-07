@@ -25,6 +25,7 @@ import com.eoe.store.DatabaseOperation;
 import com.eoe.tampletfragment.MainActivity;
 import com.eoe.tampletfragment.R;
 import com.eoe.tampletfragment.addActivity;
+import com.eoe.tampletfragment.addContactsWay;
 import com.eoe.tampletfragment.adapter.ListAdapter;
 import com.eoe.tampletfragment.view.TitleView;
 import com.eoe.tampletfragment.view.TitleView.OnLeftButtonClickListener;
@@ -314,7 +315,7 @@ public class SearchFragment extends ListFragment {
 	}
 
 	private void goHelp() {
-		Intent intent = new Intent(mActivity, addActivity.class);
+		Intent intent = new Intent(mActivity, addContactsWay.class);
 		startActivity(intent);
 	}
 
