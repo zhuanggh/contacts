@@ -9,12 +9,14 @@
         android:id="@+id/cn_word"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="15sp" />
+        android:layout_marginLeft="20dp"
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/en_word"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:textSize="15sp" />
 
 </LinearLayout>

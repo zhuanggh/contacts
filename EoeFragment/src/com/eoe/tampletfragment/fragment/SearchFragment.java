@@ -66,27 +66,7 @@ public class SearchFragment extends Fragment {
 		dbOpera = ((application) getActivity().getApplication())
 				.getDatabaseOperation();
 		db = dbOpera.getDatabase();
-	}
-
-	@Override
-	public void onStart() {
-		// TODO Auto-generated method stub
-		super.onStart();
-	}
-
-	public static SearchFragment newInstance(int index) {
-		SearchFragment f = new SearchFragment();
-
-		// Supply index input as an argument.
-		Bundle args = new Bundle();
-		args.putInt("index", index);
-		f.setArguments(args);
-
-		return f;
-	}
-
-	public int getShownIndex() {
-		return getArguments().getInt("index", 0);
+		list = dbOpera.getAllUser();
 	}
 
 	@Override
@@ -125,15 +105,9 @@ public class SearchFragment extends Fragment {
 				mActivity.startActivity(intent);
 			}
 		});
+		RefreshListView();
+		
 		initListener();
-		list = dbOpera.getAllUser();
-		list_show = list;
-		if (list_show.size() != 0) {
-			adapter.setList(list_show);
-			adapter.setType(type);
-			adapter.setSearchKeys(null);
-			adapter.notifyDataSetChanged();
-		}
 		return view;
 	}
 
@@ -161,6 +135,14 @@ public class SearchFragment extends Fragment {
 		});
 	}
 
+	@Override
+	public void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		etSearch.setText("");
+	//	RefreshListView();
+	}
+
 	// 选中菜单Item后触发
 	public boolean onContextItemSelected(MenuItem item) {
 		// 关键代码在这里 menuInfo.position
@@ -176,15 +158,16 @@ public class SearchFragment extends Fragment {
 			break;
 
 		case 1:
+			// 编辑操作
 			Intent intent = new Intent(mActivity, QueryActivity.class);
 			intent.putExtra("key", list_show.get(menuInfo.position).getId());
 			mActivity.startActivity(intent);
-			// 编辑操作
 			break;
 
 		case 2:
-			dbOpera.delete(list_show.get(menuInfo.position).getId());
 			// 删除操作
+			dbOpera.delete(list_show.get(menuInfo.position).getId());
+			etSearch.setText(etSearch.getText().toString());
 			break;
 
 		default:
@@ -285,15 +268,6 @@ public class SearchFragment extends Fragment {
 				adapter.setSearchKeys(content);
 				adapter.notifyDataSetChanged();
 
-				// if (content.length() > 0) {
-				// ArrayList<SortModel> fileterList = (ArrayList<SortModel>)
-				// search(content);
-				// adapter.updateListView(fileterList);
-				// //mAdapter.updateData(mContacts);
-				// } else {
-				// adapter.updateListView(mAllContactsList);
-				// }
-				// mListView.setSelection(0);
 				if (content == "") {
 					list_show = list;
 					if (list_show.size() != 0) {
@@ -307,30 +281,21 @@ public class SearchFragment extends Fragment {
 			}
 		});
 
-		// 璁剧疆鍙充晶[A-Z]蹇�瀵艰埅鏍忚Е鎽哥洃鍚�
-		// sideBar.setOnTouchingLetterChangedListener(new
-		// OnTouchingLetterChangedListener() {
-		//
-		// @Override
-		// public void onTouchingLetterChanged(String s) {
-		// //璇ュ瓧姣嶉娆″嚭鐜扮殑浣嶇疆
-		// int position = adapter.getPositionForSection(s.charAt(0));
-		// if (position != -1) {
-		// mListView.setSelection(position);
-		// }
-		// }
-		// });
-		// mListView.setOnItemClickListener(new OnItemClickListener() {
-		//
-		// @Override
-		// public void onItemClick(AdapterView<?> adapterView, View view, int
-		// position, long arg3) {
-		// ViewHolder viewHolder = (ViewHolder) view.getTag();
-		// viewHolder.cbChecked.performClick();
-		// adapter.toggleChecked(position);
-		// }
-		// });
+	}
 
+	public static SearchFragment newInstance(int index) {
+		SearchFragment f = new SearchFragment();
+
+		// Supply index input as an argument.
+		Bundle args = new Bundle();
+		args.putInt("index", index);
+		f.setArguments(args);
+
+		return f;
+	}
+
+	public int getShownIndex() {
+		return getArguments().getInt("index", 0);
 	}
 
 	public void search_address() {
@@ -390,4 +355,12 @@ public class SearchFragment extends Fragment {
 		startActivity(intent);
 	}
 
+	// refresh ListView列表
+	public void RefreshListView() {
+		list_show = list;
+		adapter.setList(list_show);
+		adapter.setType(type);
+		adapter.setSearchKeys(null);
+		adapter.notifyDataSetChanged();
+	}
 }
