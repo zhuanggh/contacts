@@ -6,9 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="19" />
-     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+        android:targetSdkVersion="16" />
 
     <application
         android:name="com.eoe.application.application"
@@ -27,17 +25,6 @@
         </activity>
         <activity android:name="com.eoe.tampletfragment.addActivity" />
         <activity android:name="com.eoe.tampletfragment.QueryActivity" />
-         <activity android:name="com.eoe.tampletfragment.GetQRcode" />
-         <activity android:name="com.eoe.tampletfragment.addContactsWay" />
-         <activity android:name="com.eoe.tampletfragment.addContactsByQRcode" />
-       
-         <activity
-            android:configChanges="orientation|keyboardHidden"
-            android:name="com.zxing.activity.CaptureActivity"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:windowSoftInputMode="stateAlwaysHidden" >
-        </activity>    
     </application>
 
 </manifest>

@@ -33,7 +33,7 @@ public class addActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_addcontacts_byhands);
+		setContentView(R.layout.activity_addcontacts);
 		context = this;
 		dbOpera = ((application) getApplication()).getDatabaseOperation();
 		db = dbOpera.getDatabase();
