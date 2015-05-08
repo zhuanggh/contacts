@@ -1,6 +1,5 @@
 package com.eoe.store;
 
-
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.Context;
@@ -15,28 +14,31 @@ import org.wltea.analyzer.core.IKSegmenter;
 import org.wltea.analyzer.core.Lexeme;
 
 public class DatabaseOperation {
-	private static boolean isload=false; //静态数据，用于判断分词词典是否加载好了
-	private static Stack<ContactsInfo> stack=new Stack();//存储待插入数据
+	private static boolean isload = false; // 静态数据，用于判断分词词典是否加载好了
+	private static Stack<ContactsInfo> stack = new Stack();// 存储待插入数据
 	private Context context;
 	private SQLiteDatabase db;
 	private DatabaseHelper database_helper;
 	private String name = "contacts.db";
+
 	public DatabaseOperation(Context context) {
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		database_helper = new DatabaseHelper(context, name);
 		db = database_helper.getWritableDatabase();// 这里是获得可写的数据库
 	}
-	
-	public void setInfo(){
-		while(!stack.empty()){
+
+	public void setInfo() {
+		while (!stack.empty()) {
 			insert2(stack.pop());
 		}
-		isload=true;
+		isload = true;
 	}
-	public boolean getInfo(){
+
+	public boolean getInfo() {
 		return isload;
 	}
+
 	public SQLiteDatabase getDatabase() {
 		return db;
 	}
@@ -44,11 +46,11 @@ public class DatabaseOperation {
 	public void deleteDatabase() {
 		database_helper.deleteDatabase(context, name);
 	}
-	
+
 	public void insert(ContactsInfo user) {
-		if(isload)
+		if (isload)
 			insert2(user);
-		else 
+		else
 			stack.push(user);
 	}
 
@@ -170,9 +172,9 @@ public class DatabaseOperation {
 	/**
 	 * 前提：id和name必须有，才能进行modify操作,id相同保证的和其他表的一致性 输入一个ContactsInfo user，进行数据库的更新
 	 */
-	public void modify(ContactsInfo user) {
+	public void modify(int id, ContactsInfo user) {
 		// 删除旧的数据
-		delete(user.getId());
+		delete(id);
 		// id和name必须有，才能进行modify操作,id相同保证的和其他表的一致性
 		insert(user);
 	}
@@ -205,13 +207,16 @@ public class DatabaseOperation {
 	 */
 	public ArrayList<ContactsInfo> getAllUser() {
 		ArrayList<ContactsInfo> list = new ArrayList<ContactsInfo>();
-		Cursor cursor = db.query("contacts", new String[] { "id", "name",
-				"pinYin", "address", "remarks" ,"FirstpinYin"}, null, null, null, null, null);
+		// order by pinYin COLLATE LOCALIZED
+		//new String[] { "id", "name","pinYin", "address", "remarks", "FirstpinYin" }
+		Cursor cursor = db.query("contacts",null , null, null,
+				null, null, "pinYin ASC", null);
 		while (cursor.moveToNext()) {
 			ContactsInfo user = new ContactsInfo();
 			user.setId(cursor.getInt(cursor.getColumnIndex("id")));
 			user.setPinYin(cursor.getString(cursor.getColumnIndex("pinYin")));
-			user.setFirstPinYin(cursor.getString(cursor.getColumnIndex("FirstpinYin")));
+			user.setFirstPinYin(cursor.getString(cursor
+					.getColumnIndex("FirstpinYin")));
 			user.setName(cursor.getString(cursor.getColumnIndex("name")));
 			user.setAddress(cursor.getString(cursor.getColumnIndex("address")));
 			user.setRemark(cursor.getString(cursor.getColumnIndex("remarks")));
@@ -229,5 +234,4 @@ public class DatabaseOperation {
 		cursor.close();
 		return list;
 	}
-
 }

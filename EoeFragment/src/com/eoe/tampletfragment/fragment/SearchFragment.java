@@ -31,6 +31,7 @@ import com.eoe.tampletfragment.MainActivity;
 import com.eoe.tampletfragment.QueryActivity;
 import com.eoe.tampletfragment.R;
 import com.eoe.tampletfragment.addActivity;
+import com.eoe.tampletfragment.contactEditActivity;
 import com.eoe.tampletfragment.adapter.ListAdapter;
 import com.eoe.tampletfragment.view.TitleView;
 import com.eoe.tampletfragment.view.TitleView.OnLeftButtonClickListener;
@@ -66,6 +67,7 @@ public class SearchFragment extends Fragment {
 		dbOpera = ((application) getActivity().getApplication())
 				.getDatabaseOperation();
 		db = dbOpera.getDatabase();
+		list.clear();
 		list = dbOpera.getAllUser();
 	}
 
@@ -105,8 +107,6 @@ public class SearchFragment extends Fragment {
 				mActivity.startActivity(intent);
 			}
 		});
-		RefreshListView();
-		
 		initListener();
 		return view;
 	}
@@ -139,8 +139,8 @@ public class SearchFragment extends Fragment {
 	public void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		etSearch.setText("");
-	//	RefreshListView();
+		RefreshListView();
+		// RefreshListView();
 	}
 
 	// 选中菜单Item后触发
@@ -159,14 +159,14 @@ public class SearchFragment extends Fragment {
 
 		case 1:
 			// 编辑操作
-			Intent intent = new Intent(mActivity, QueryActivity.class);
-			intent.putExtra("key", list_show.get(menuInfo.position).getId());
+			Intent intent = new Intent(mActivity, contactEditActivity.class);
+			intent.putExtra("id", list_show.get(menuInfo.position).getId());
 			mActivity.startActivity(intent);
 			break;
 
 		case 2:
 			// 删除操作
-			dbOpera.delete(list_show.get(menuInfo.position).getId());
+			dbOpera.delete((list_show.get(menuInfo.position)).getId());
 			etSearch.setText(etSearch.getText().toString());
 			break;
 
@@ -211,7 +211,11 @@ public class SearchFragment extends Fragment {
 				} else {
 					ivClearText.setVisibility(View.VISIBLE);
 				}
-				if (content.matches("[0-9]+")) {
+
+				if ("".equals(content)) {
+					list_show=(ArrayList<ContactsInfo>) list.clone();
+					type.clear();
+				} else if (content.matches("[0-9]+")) {
 					Cursor cursor = db.rawQuery(
 							"select * from phone where phonenum like'%"
 									+ content + "%'", null);
@@ -260,24 +264,14 @@ public class SearchFragment extends Fragment {
 					}
 					cursor.close();
 				}
-				search_address();
-				search_remarks();
-
+				if (!"".equals(content)) {
+					search_address();
+					search_remarks();
+				}
 				adapter.setList(list_show);
 				adapter.setType(type);
 				adapter.setSearchKeys(content);
 				adapter.notifyDataSetChanged();
-
-				if (content == "") {
-					list_show = list;
-					if (list_show.size() != 0) {
-						adapter.setList(list_show);
-						type.clear();
-						adapter.setType(type);
-						adapter.setSearchKeys(null);
-						adapter.notifyDataSetChanged();
-					}
-				}
 			}
 		});
 
@@ -357,7 +351,9 @@ public class SearchFragment extends Fragment {
 
 	// refresh ListView列表
 	public void RefreshListView() {
-		list_show = list;
+		//ArrayList<E>作为一个类容器，list_show=list并不会创建新对象给list_show，而是给list的地址给它
+		list_show = (ArrayList<ContactsInfo>) list.clone();
+		type.clear();
 		adapter.setList(list_show);
 		adapter.setType(type);
 		adapter.setSearchKeys(null);
